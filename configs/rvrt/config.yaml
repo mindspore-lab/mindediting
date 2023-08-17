@@ -1,0 +1,181 @@
+system:
+  device_target: null
+  random_seed: null
+  mindspore_seed: null
+  numpy_seed: null
+  context_mode: "graph_mode"
+  is_train_distributed: false
+  graph_kernel_flags: null
+  enable_graph_kernel: False
+
+model:
+  name: "rvrt"
+  load_path: "/data/LLVT/RVRT/ckpt/trained/iter_300000_rvrt_38.12.ckpt"
+  spynet_path: "/data/LLVT/VRT/ckpt/converted/spynet_sintel_final-3d2a1287.ckpt"
+  upscale: 4
+  clip_size: 2
+  img_size: [14, 64, 64]
+  window_size: [2, 8, 8]
+  num_blocks: [1, 2, 1]
+  depths: [2, 2, 2]
+  embed_dims: [144, 144, 144]
+  num_heads: [6, 6, 6]
+  mlp_ratio: 2
+  inputconv_groups: [1, 1, 1, 1, 1, 1]
+  max_residue_magnitude: 10
+  deformable_groups: 12
+  attention_heads: 12
+  attention_window: [3, 3]
+  to_float16: False
+
+validator:
+  name: "tiling"
+  temporal_overlap: 0
+  spatial_overlap: 0
+  temporal_size: 0
+  spatial_size: [0, 0] # h,w
+  scale: 4
+  input_tensor_type: "mindspore"
+
+# Dataset options
+dataset:
+  dataset_name: "vimeo_super_resolution"
+  input_path: "/data/LLVT/Basic_VSR/data/vimeo_super_resolution"
+  train_annotation: 'sep_trainlist.txt'
+  test_annotation: 'sep_testlist.txt'
+  gt_subdir: 'sequences'
+  lr_subdir: 'BIx4'
+  batch_size: 1  # for all GPUs
+  lr_type: "bicubic"
+  scale: 4
+  max_rowsize: 32
+  dataset_sink_mode: False
+  num_frames: 7
+  num_samples: null
+  eval_batch_size: 1
+  num_parallel_workers: 16
+  every_nth: 1
+
+val_dataset:
+  dataset_name: "vimeo_super_resolution"
+  input_path: "/data/LLVT/Basic_VSR/data/vimeo_super_resolution"
+  train_annotation: 'sep_trainlist.txt'
+  test_annotation: 'sep_testlist.txt'
+  gt_subdir: 'sequences'
+  lr_subdir: 'BIx4'
+  batch_size: 1  # for all GPUs
+  lr_type: "bicubic"
+  scale: 4
+  max_rowsize: 32
+  dataset_sink_mode: False
+  num_frames: 7
+  num_samples: null
+  eval_batch_size: 1
+  num_parallel_workers: 1
+  every_nth: 1
+
+# Common training options
+loss:
+  name: "CharbonnierLoss"
+  weight: 1.0
+  amp_level: "O0"
+  loss_scale: 1000.0 # for ['O2', 'O3', 'auto']
+
+# Training
+train:
+  cast_net: "float16"
+  cast_loss: "float32"
+  is_use_dynamic_loss_scale: True
+  val_monitor: False
+  eval_network: "cast_fp32"
+
+# Optimizer options
+optimizer:
+  name: "Adam"
+  learning_rate: 2.0e-4 # should not be used
+  weight_decay: 0.0
+  beta1: 0.9
+  beta2: 0.99
+
+# Scheduler options
+scheduler:
+  name: "cosine_annealing"
+  base_lr: 2.0e-4
+  min_lr: 1.0e-7
+  warmup_epochs: 0
+  warmup_factor: 0.0
+  warmup_base_lr: 2.0e-4 # freeze
+
+extra_scheduler:
+  name: "warmup_cosine_annealing"
+  lr_mul: 0.25
+  warmup_epochs: 1 # freeze epochs ~5000 iter for vimeo
+  warmup_factor: 0.0
+  warmup_base_lr: 0.0 # freeze
+  param_prefixes: ["spynet"]
+
+# Metric options
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: 'y'
+    process_middle_image: [True, True]
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: 'y'
+    process_middle_image: [True, True]
+
+train_params:
+  epoch_size: 100
+  need_val: True
+  keep_checkpoint_max: 60
+  save_epoch_frq: 1
+  eval_frequency: 10
+  print_frequency: 10
+  ckpt_save_dir: "./ckpt/rvrt"
+  profile:
+    start: 2
+    stop: 10
+    output_path: profile
+    by_epoch: False
+    exit_after: True
+    add_datetime_suffix: True
+
+# Preprocessing pipeline and augmentations for training phase
+train_pipeline:
+  name: basicvsr
+  pipeline:
+    - RescaleToZeroOne:
+        keys: [ 'lq', 'gt' ]
+    - PairedRandomCrop:
+        gt_patch_size: 256
+    - RandomFlip:
+        keys: [ 'lq', 'gt' ]
+        flip_ratio: 0.5
+        direction: 'horizontal'
+    - RandomFlip:
+        keys: [ 'lq', 'gt' ]
+        flip_ratio: 0.5
+        direction: 'vertical'
+    - RandomTransposeHW:
+        keys: [ 'lq', 'gt' ]
+        transpose_ratio: 0.5
+    - MirrorSequence:
+        keys: [ 'lq', 'gt' ]
+    - Collect:
+        keys: [ 'lq', 'gt' ]
+
+# Preprocessing pipeline and augmentations for evaluation phase
+test_pipeline:
+  name: basicvsr
+  pipeline:
+    - RescaleToZeroOne:
+        keys: [ 'lq', 'gt' ]
+    - MirrorSequence:
+        keys: [ 'lq', 'gt' ]
+    - Collect:
+        keys: [ 'lq', 'gt' ]

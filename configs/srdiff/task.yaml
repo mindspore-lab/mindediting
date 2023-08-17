@@ -1,0 +1,21 @@
+task_name: video_enhancement
+task_type: image
+input_file: "/data/LLVT/BasicVSR_plus_plus/data/Set8/motorbike"
+output_file: "/cache"
+windows_size: 1
+fixed_width: 0
+fixed_height: 0
+up_scale: 4
+color_space: rgb
+tasks:
+  - task_name: sisr
+    task_type: super_resolution
+    data_io: srdiff_sr
+    backend: ascend
+    dtype: float16
+    model_file: "/data/LLVT/ACL/om/srdiff_srx4_fp32_1x3x64x64.om"
+    once_process_frames: 1
+    frame_overlap: 0
+    patch_overlap: 0
+    up_scale: 4
+    tiling: "simple_image"

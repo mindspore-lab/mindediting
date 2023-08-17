@@ -1,0 +1,112 @@
+system:
+  random_seed: null
+  mindspore_seed: null
+  numpy_seed: null
+  context_mode: "graph_mode"
+  graph_kernel_flags: null
+
+model:
+  name: "nafnet"
+  load_path: null
+
+# Dataset options
+dataset:
+  dataset_name: "gopro"
+  input_path: "/data/LLVT/MIMO-UNet/data/GOPRO_Large/"
+  video_mode: False
+  every_nth: 1
+  scale: 1
+  batch_size: 16
+
+  num_samples: null
+  eval_batch_size: 1
+
+  num_parallel_workers: 8
+  max_rowsize: 256
+  python_multiprocessing: True
+  dataset_sink_mode: False
+  transform_while_batching: False
+
+# Common training options
+loss:
+  name: "PSNRLoss"
+  weight: 1.0
+  amp_level: "O0"
+  loss_scale: 1.0 # for ['O2', 'O3', 'auto']
+
+# Optimizer options
+optimizer:
+  name: "Adam"
+  learning_rate: 1.0e-3
+  weight_decay: 0.0
+  beta1: 0.9
+  beta2: 0.9
+
+# Scheduler options
+scheduler:
+  name: "cosine_annealing"
+  base_lr: 1.0e-3
+  min_lr: 1.0e-6
+  warmup_epochs: 0
+  warmup_factor: 0.0
+  warmup_base_lr: 0.0
+
+# Metric options
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+    process_middle_image: [False, False]
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+    process_middle_image: [False, False]
+
+train_params:
+  initial_epoch: 0
+  epoch_size: 8000
+  need_val: True
+  keep_checkpoint_max: 10
+  save_epoch_frq: 100
+  eval_frequency: 250
+  print_frequency: 100
+  ckpt_save_dir: "./ckpt/nafnet_gopro"
+
+#val_params:
+  #img_save_directory: "/tmp/nafnet_denoise/"
+  #save_bgr: True
+
+# Preprocessing pipeline and augmentations for training phase
+train_pipeline:
+  name: nafnet
+  pipeline:
+    - PairedRandomCrop:
+        gt_patch_size: 256
+    - RescaleToZeroOne:
+        keys: [ 'lq', 'gt' ]
+    - RandomFlip:
+        keys: [ 'lq', 'gt' ]
+        flip_ratio: 0.5
+        direction: 'horizontal'
+    - RandomFlip:
+        keys: [ 'lq', 'gt' ]
+        flip_ratio: 0.5
+        direction: 'vertical'
+    - RandomTransposeHW:
+        keys: [ 'lq', 'gt' ]
+        transpose_ratio: 0.5
+    - Collect:
+        keys: [ 'lq', 'gt']
+
+# Preprocessing pipeline and augmentations for evaluation phase
+test_pipeline:
+  name: nafnet
+  pipeline:
+    - RescaleToZeroOne:
+        keys: [ 'lq', 'gt' ]
+    - Collect:
+        keys: [ 'lq', 'gt' ]

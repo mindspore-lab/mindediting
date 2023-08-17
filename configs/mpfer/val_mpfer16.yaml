@@ -1,0 +1,73 @@
+system:
+  random_seed: 1
+  mindspore_seed: 1
+  numpy_seed: 1
+  context_mode: "pynative_mode"
+  graph_kernel_flags: null
+
+
+dataset:
+  dataset_name: "space"
+  input_path: "/data/LLVT/MPFER/data"
+  eval_batch_size: 1
+  num_frames: 0
+  scale: 1
+  noise_level: 50
+  dataset_sink_mode: False
+  num_parallel_workers: 8
+
+  valid_scenes: [0,9,10,23,24,52,56,62,63,73]
+  position: 0
+  input_indices: [6,0,1,2,3,4,5,7,8,9,10,11,12,13,14,15]
+  ref_height: 496
+  log_sig_read: -0.6 #[-1.44, -1.08, -0.72, -0.6]
+  log_sig_shot: -0.5 #[-0.92, -0.74, -0.56, -0.5]
+  load_path: "/data/LLVT/MPFER/ckpt"
+  version: "mpfer16"
+
+model:
+  name: "mpfer"
+  load_path: "/data/LLVT/MPFER/ckpt"
+  version: "mpfer16"
+
+loss:
+  name: "MSELoss"
+  loss_scale: 1.0
+  amp_level: "O0"
+
+scheduler:
+  base_lr: 0.00001
+  min_lr: 1e-08
+  name: "cosine_annealing"
+
+  weight_decay: 0
+  warmup_epochs: 0
+  warmup_factor: 1.0
+
+# Optimizer options
+optimizer:
+  name: "Adam"
+  weight_decay: 0.0
+  beta1: 0.9
+  beta2: 0.999
+
+
+# Metric options
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+
+validator:
+  name: "mpfer"
+
+test_pipeline:
+  name: "mpfer"
+  pipeline: null

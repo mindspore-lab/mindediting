@@ -1,0 +1,94 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+# ==============================================================================
+# options
+
+# Context options
+system:
+  device_target: "CPU"
+  random_seed: 1
+  mindspore_seed: 1
+  numpy_seed: 1
+  context_mode: "graph_mode"
+  is_train_distributed: false
+  graph_kernel_flags: null
+
+dataset:
+  dataset_name: "gopro"
+  input_path: "/data/LLVT/MIMO-UNet/data/GOPRO_Large"
+  video_mode: False
+  batch_size: 4
+  num_parallel_workers: 8
+  num_samples: null
+  num_frames: null
+  scale: null
+  dataset_sink_mode: true # different with validate
+  eval_batch_size: 1
+  make_aug: True
+
+# Model
+model:
+  name: "mimo_unet"
+  load_path: "/data/LLVT/MIMO-UNet/ckpt/MIMO-UNet_3000_1_fp16_o3_dls.ckpt"
+
+# Loss
+loss:
+  name: "content_loss"
+  amp_level: "O0"
+  loss_scale: 1.0
+
+# Scheduler
+scheduler:
+  name: "epoch_decay_lr"
+  warmup_epochs: 0
+  base_lr: 1.0e-4
+  min_lr: 1.0e-7
+  warmup_factor: 0.0
+  warmup_base_lr: 1.0e-4 # freeze
+
+# Optimizer
+optimizer:
+  name: "Adam"
+  learning_rate: 0.0001
+  beta1: 0.9
+  beta2: 0.999
+  weight_decay: 0.0
+
+# Training
+train:
+  cast_net: "base"
+  cast_loss: "base"
+  is_use_dynamic_loss_scale: true
+  val_monitor: false
+  eval_network: "cast_fp32"
+
+# Callback
+train_params:
+  epoch_size: 3000
+  need_val: True
+  ckpt_save_dir: "./ckpt/mimo_unet"
+  keep_checkpoint_max: 10
+  save_epoch_frq: 1
+  eval_frequency: 1
+  print_frequency: 1
+  val_acc_monitor_interval: 100
+
+# Metric
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+
+# Preprocessing pipeline and augmentations for training phase
+train_pipeline:
+  null
+
+# Preprocessing pipeline and augmentations for evaluation phase
+test_pipeline:
+  null

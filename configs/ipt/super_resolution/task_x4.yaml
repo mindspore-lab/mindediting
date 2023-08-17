@@ -1,0 +1,17 @@
+task_name: image_enhances
+task_type: image
+input_file: "/data/LLVT/BasicVSR_plus_plus/data/Set8/motorbike"
+output_file: "/cache/ipt_task_srx4"
+windows_size: 1
+fixed_width: 0
+fixed_height: 0
+color_space: rgb
+tasks:
+  - task_name: super_resolution_x4
+    task_type: super_resolution
+    data_io: IPT_SR
+    backend: ascend
+    model_file: /data/LLVT/ACL/om/ipt_srx4_fp32_1x3x48x48.om
+    once_process_frames: 1
+    up_scale: 4
+    tiling: null

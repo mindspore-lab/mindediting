@@ -1,0 +1,81 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+# ==============================================================================
+# options
+
+# Context options
+system:
+  device_target: "GPU"
+  random_seed: 1
+  mindspore_seed: 1
+  numpy_seed: 1
+  context_mode: "graph_mode"
+  is_train_distributed: false
+  graph_kernel_flags: null
+
+# Dataset
+dataset:
+  dataset_name: "Set5"
+  input_path: "/data/LLVT/FSRCNN/data/Set5_x4.h5"
+  num_parallel_workers: 8
+  num_samples: null
+  num_frames: null
+  scale: 4
+  dataset_sink_mode: false # different with validate
+  eval_batch_size: 1
+
+# Model
+model:
+  name: "fsrcnn"
+  scale: 4
+  rgb: false
+  load_path: "/data/LLVT/FSRCNN/ckpt/fsrcnn_ms_gpu.ckpt"
+
+
+# Loss
+loss:
+  name: "mseloss"
+  amp_level: "O3"
+  loss_scale: 1.0
+
+# Scheduler
+scheduler:
+  name: "constant"
+  warmup_epochs: 0
+
+# Optimizer
+optimizer:
+  name: "Adam"
+  learning_rate: 0.001
+  beta1: 0.9
+  beta2: 0.999
+
+# Training
+train:
+  cast_net: "base"
+  cast_loss: "base"
+  is_use_dynamic_loss_scale: false
+  val_monitor: false
+  eval_network: null
+
+
+# Metric
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+
+# Preprocessing pipeline and augmentations for training phase
+train_pipeline:
+  null
+
+# Preprocessing pipeline and augmentations for evaluation phase
+test_pipeline:
+  name: fsrcnn
+  pipeline: null

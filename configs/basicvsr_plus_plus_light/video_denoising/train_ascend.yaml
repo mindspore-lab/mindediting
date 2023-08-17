@@ -1,0 +1,173 @@
+system:
+  random_seed: null
+  mindspore_seed: null
+  numpy_seed: null
+  context_mode: "graph_mode"
+  graph_kernel_flags: null
+
+model:
+  name: "basicvsr_plus_plus_light"
+  load_path: null
+  params:
+    mid_channels: 64
+    num_blocks: 15
+    num_blocks_align: 5
+    is_low_res_input: False
+    upsample_blocks_last: False
+    has_bias: False
+    activation: "ReLU"
+    custom_depth_to_space: True
+
+# Dataset options
+dataset:
+  dataset_name: "davis2017"
+  input_path: "/data/LLVT/VRT/data/DAVIS-2017-Unsupervised-trainval-480p/DAVIS"
+  resolution: "480p"
+  video_mode: True
+  use_val_for_training: True
+  return_paths: True
+  num_frames: null
+  scale: 1
+
+  batch_size: 1
+
+  num_samples: null
+  eval_batch_size: 1
+
+  num_parallel_workers: 8
+  max_rowsize: 42
+  python_multiprocessing: True
+  dataset_sink_mode: True
+  transform_while_batching: False
+
+val_dataset:
+  dataset_name: "set8"
+  input_path: "/data/LLVT/BasicVSR_plus_plus/data/Set8/"
+  return_paths: True
+  num_frames: null
+  scale: 1
+
+  num_samples: null
+  eval_batch_size: 1
+
+  num_parallel_workers: 1
+  max_rowsize: 200
+  python_multiprocessing: True
+  dataset_sink_mode: False
+  transform_while_batching: False
+  profile_preproc_pipeline: False
+
+# Common training options
+loss:
+  name: "CharbonnierLoss"
+  weight: 1.0
+  amp_level: "O2"
+  loss_scale: 1000.0 # for ['O2', 'O3', 'auto']
+
+# Optimizer options
+optimizer:
+  name: "Adam"
+  learning_rate: 1.0e-4
+  weight_decay: 0.0
+  beta1: 0.9
+  beta2: 0.99
+
+# Scheduler options
+scheduler:
+  name: "cosine_annealing"
+  base_lr: 1.0e-4
+  min_lr: 1.0e-7
+  warmup_epochs: 0
+  warmup_factor: 0.0
+  warmup_base_lr: 1.0e-4 # freeze
+
+# Metric options
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 5
+    input_order: 'CHW'
+    convert_to: null
+    process_middle_image: [False, False]
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+    process_middle_image: [False, False]
+
+train_params:
+  initial_epoch: 0
+  epoch_size: 55000  # Number of epochs to train.
+  need_val: True
+  keep_checkpoint_max: 10
+  save_epoch_frq: 1000
+  eval_frequency: 1000
+  print_frequency: 1
+  ckpt_save_dir: "./ckpt/basicvsr_plus_plus_light"
+  profile:
+    start: 2
+    stop: 3
+    output_path: artifacts/profile
+
+# Preprocessing pipeline and augmentations for training phase
+train_pipeline:
+  name: basicvsr_plus_plus_light
+  pipeline:
+    - GenerateSegmentIndices:
+        keys: ['gt']
+        num_frames: 25
+        random: True
+        interval_list: [1]
+    - LoadImageFromFileList:
+        key: 'gt'
+        channel_order: 'rgb'
+    - RandomCrop:
+        key: 'gt'
+        patch_size: 256
+    - RandomMultidirectionalFlip:
+        keys: ['gt']
+        horizontal_flip_ratio: 0.5
+        vertical_flip_ratio: 0.5
+        diagonal_flip_ratio: 0.5
+    - RescaleToZeroOne:
+        keys: ['gt']
+    - CopyValues:
+        src_keys: ['gt']
+        dst_keys: ['lq']
+    - RandomNoise:
+        keys: ['lq']
+        params:
+          noise_type: ['gaussian']
+          noise_prob: [1]
+          gaussian_sigma: [0, 50]
+          gaussian_gray_noise_prob: 0
+    - Collect:
+        keys: ['lq', 'gt']
+
+# Preprocessing pipeline and augmentations for evaluation phase
+test_pipeline:
+  name: basicvsr_plus_plus_light
+  pipeline:
+    - GenerateSegmentIndices:
+        keys: ['gt']
+        num_frames: 25
+        random: False
+        interval_list: [1]
+    - LoadImageFromFileList:
+        key: 'gt'
+        channel_order: 'rgb'
+    - RescaleToZeroOne:
+        keys: ['gt']
+    - CopyValues:
+        src_keys: ['gt']
+        dst_keys: ['lq']
+    - RandomNoise:
+        keys: ['lq']
+        params:
+          noise_type: ['gaussian']
+          noise_prob: [1]
+          gaussian_sigma: [50, 50]
+          gaussian_gray_noise_prob: 0
+    - Collect:
+        keys: [ 'lq', 'gt' ]

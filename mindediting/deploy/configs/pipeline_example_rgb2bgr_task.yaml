@@ -1,0 +1,31 @@
+task_name: video_enhances
+task_type: video
+input_file: ../output/Youku_00006_l.y4m
+output_file: ../output/Youku_00006_l_video_deburl_sr.mp4
+windows_size: 1
+fixed_width: 480
+fixed_height: 360
+up_scale: 4
+color_space: bgr
+tasks:
+  - task_name: BGR2RGB
+    task_type: plugin
+    data_io: bgr_to_rgb
+    once_process_frames: 25
+
+  - task_name: super_resolution_x4
+    task_type: super_resolution
+    data_io: BasicVSR_MindSpore
+    backend: ascend
+    dtype: float16
+    model_file: /data/LLVT/Basic_VSR/ckpt/om/basicvsr_360x480_25_uint8.om
+    once_process_frames: 25
+    up_scale: 4
+    frame_overlap: 0
+    patch_overlap: 0
+    device_id: 0
+
+  - task_name: RGB2BGR
+    task_type: plugin
+    data_io: rgb_to_bgr
+    once_process_frames: 25

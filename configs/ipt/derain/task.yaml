@@ -1,0 +1,17 @@
+task_name: image_enhances
+task_type: image
+input_file: "/data/LLVT/BasicVSR_plus_plus/data/Set8/motorbike"
+output_file: "/cache/ipt_task_derain"
+windows_size: 1
+fixed_width: 0
+fixed_height: 0
+color_space: rgb
+tasks:
+  - task_name: ipt_derain
+    task_type: derain
+    data_io: IPT_SR
+    backend: ascend
+    model_file: /data/LLVT/ACL/om/ipt_derain_fp32_1x3x48x48.om
+    once_process_frames: 1
+    up_scale: 1
+    tiling: null

@@ -1,0 +1,22 @@
+task_name: video_enhances
+task_type: image
+input_file: "/data/LLVT/BasicVSR_plus_plus/data/Set8/motorbike"
+output_file: "/cache"
+windows_size: 1
+fixed_width: 448
+fixed_height: 256
+up_scale: 1
+color_space: rgb
+fps_multiplier: 2
+tasks:
+  - task_name: video_frame_interpolation
+    task_type: video_frame_interpolation
+    data_io: IFRPlus_VFI
+    backend: ascend
+    dtype: float16
+    model_file: /data/LLVT/ACL/om/ifr_plus_v155_fp16_1x2x3x256x448.om
+    once_process_frames: 2
+    up_scale: 1
+    frame_overlap: 1
+    patch_overlap: 0
+    tiling: default

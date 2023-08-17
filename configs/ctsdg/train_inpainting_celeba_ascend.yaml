@@ -1,0 +1,119 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+# ==============================================================================
+# options
+
+# Context options
+system:
+  device_target: "Ascend" # diff with gpu
+  random_seed: null
+  mindspore_seed: 42
+  numpy_seed: null
+  context_mode: "graph_mode"
+  is_train_distributed: false
+  graph_kernel_flags: null # diff with gpu
+
+# Dataset
+dataset:
+  dataset_name: "celeba"
+  input_path: "/data/LLVT/CTSDG/data/CelebA/Img/img_align_celeba" # not use
+  train_masks_root: '/data/LLVT/CTSDG/data/Irregular-Mask/disocclusion_img_mask'
+  eval_masks_root: '/data/LLVT/CTSDG/data/Irregular-Mask/testing_mask_dataset'
+  data_root: '/data/LLVT/CTSDG/data/CelebA/Img/img_align_celeba'
+  anno_path: '/data/LLVT/CTSDG/data/CelebA/Eval/list_eval_partition.txt'
+  anno_train_index: 0
+  anno_eval_index: 2
+  # Data preprocessing
+  image_load_size:
+    - 256
+    - 256
+  sigma: 2
+  batch_size: 6
+  num_parallel_workers: 4
+  num_samples: null
+  num_frames: null
+  scale: null
+  dataset_sink_mode: false
+  eval_batch_size: 1
+
+# Model
+model:
+  name: "ctsdg"
+  load_path: null
+  load_discriminator_path: null
+  image_in_channels: 3
+  edge_in_channels: 2
+  out_channels: 3
+  pretrained_vgg: '/data/LLVT/CTSDG/ckpt/pretrained_weights/vgg16_feat_extr_ms.ckpt'
+  is_train_finetune: false
+
+# Loss
+loss:
+  name: "ctsdg_loss"
+  amp_level: "O0"
+  loss_scale: 1.0
+  hole_loss_w: 60.0
+  valid_loss_w: 10.0
+  perceptual_loss_w: 0.1
+  style_loss_w: 250.0
+  adversarial_loss_w: 0.1
+  intermediate_loss_w: 1.0
+
+# Scheduler
+scheduler:
+  name: null
+  warmup_epochs: 0
+
+# Optimizer
+optimizer:
+  name: "gan_adam"
+  learning_rate: 0.0001
+  gen_lr_train: 0.0002
+  gen_lr_finetune: 0.00005
+  dis_lr_multiplier: 0.1
+  beta1: 0.9
+  beta2: 0.999
+
+# Training
+train:
+  cast_net: null
+  cast_loss: null
+  is_use_dynamic_loss_scale: false
+  val_monitor: false
+  eval_network: null
+  train_iter: 350000
+  finetune_iter: 150000
+  start_iter: 0
+
+# Callback
+train_params:
+  epoch_size: 100
+  need_val: False
+  ckpt_save_dir: "./ckpt/ctsdg"
+  keep_checkpoint_max: 3
+  save_epoch_frq: 1
+  eval_frequency: 1
+  print_frequency: 1
+  val_acc_monitor_interval: 100
+  log_frequency_step: 100
+  save_checkpoint_steps: 10000
+
+# Metric
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+
+# Preprocessing pipeline and augmentations for training phase
+train_pipeline:
+  null
+
+# Preprocessing pipeline and augmentations for evaluation phase
+test_pipeline:
+  null

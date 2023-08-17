@@ -1,0 +1,134 @@
+system:
+  random_seed: null
+  mindspore_seed: null
+  numpy_seed: null
+  context_mode: "pynative_mode"
+  graph_kernel_flags: null
+
+model:
+  name: "ipt"
+  # Pretrained weights
+  load_path: "/data/LLVT/IPT/ckpt/ipt_x2_ascend_v190_set5_research_cv_acc38.3.ckpt"
+  is_training_finetune: false
+  task_type: 'sr'
+  act: relu
+  test_only: true # for one-by-one task test
+  n_colors: 3
+
+  n_feats: 64
+  transformer:
+    patch_dim: 3
+    num_heads: 12
+    num_layers: 12
+    num_queries: 1
+    dropout_rate: 0
+    no_norm: false
+    post_norm: false
+    no_mlp: false
+    test: true
+    chop_new: true
+    pos_every: false
+    no_pos: false
+    reweight: false
+  RDN:
+    G0: 64
+    RDNkSize: 3
+    RDNconfig: B
+  RCAN:
+    n_resgroups: 10
+    reduction: 16
+
+# mutil-task
+task:
+  denoise:
+    denoise: false
+    sigma: 25
+  derain:
+    derain: false
+    finetune: 25
+    derain_test:
+  alltask:
+    alltask: false
+    task_id: 2 # using to choose task, please set test_only=True
+  dehaze:
+    dehaze: false
+    dehaze_test: 100
+    indoor: false
+    outdoor: false
+    nochange: false
+  deblur:
+    deblur: false
+    deblur_test: 1000
+
+# Dataset options
+dataset:
+  dataset_name: "set5"
+  input_path: "/data/LLVT/IPT/data_other/Set5"
+  dataset_sink_mode: False
+  train_annotation: null
+  test_annotation: null
+  gt_subdir: 'HR/'
+  lr_subdir: 'LR_bicubic/'
+  batch_size: 1
+  scale:
+    - 2
+  split_batch: 1
+  patch_size: 48
+  rgb_range: 255
+  n_colors: 3
+  num_frames: null
+  num_samples: null
+  eval_batch_size: 1
+  num_parallel_workers: 8
+
+# Common training options
+loss:
+  name: 'l1loss' # ipt_pretrain_loss only for imagenet pretrain / if finetune, please set l1loss
+  amp_level: "O0"
+  loss_scale: 65536.0
+  con_loss: False  # only for imagenet pretrain / if finetune or val, please set False
+  skip_threshold: 1.0e8
+
+# Optimizer options
+optimizer:
+  name: "Adam"
+  weight_decay: 0.0
+  loss_scale: 1024.0
+  beta1: 0.9
+  beta2: 0.99
+  momentum: 0.9
+
+# Scheduler options
+scheduler:
+  name: "exponential_lr"
+  base_lr: 1.0e-4
+  min_lr: 1.0e-7
+  warmup_epochs: 0
+  warmup_factor: 0
+  gamma: 0.5
+
+# Metric options
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: 'y'
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: 'y'
+
+
+# Preprocessing pipeline and augmentations for training phase
+train_pipeline:
+  name: "ipt"
+  pipeline: null
+
+# Preprocessing pipeline and augmentations for evaluation phase
+test_pipeline:
+  name: "ipt"
+  pipeline: null
+
+export_helper: ipt

@@ -1,0 +1,63 @@
+system:
+  random_seed: 1
+  mindspore_seed: 1
+  numpy_seed: 1
+  context_mode: "graph_mode"
+  graph_kernel_flags: null
+
+
+dataset:
+  dataset_name: "sidd"
+  input_path: "/data/LLVT/Tunable_Conv/data/SIDD/"
+  eval_batch_size: 1
+  num_frames: 0
+  scale: 1
+  dataset_sink_mode: False
+  num_parallel_workers: 8
+
+
+model:
+  name: "tunable_nafnet"
+  load_path: "/data/LLVT/Tunable_Conv/ckpt/t_nafnet_ms.ckpt"
+  img_channels: 3
+  num_params: 2
+  mode: "mlp"
+  params: [0.5, 0.5]
+
+
+loss:
+  name: "MSELoss"
+  loss_scale: 1.0
+  amp_level: "O0"
+
+scheduler:
+  base_lr: 0.00001
+  min_lr: 1e-08
+  name: "cosine_annealing"
+
+  weight_decay: 0
+  warmup_epochs: 0
+  warmup_factor: 1.0
+
+# Optimizer options
+optimizer:
+  name: "Adam"
+  weight_decay: 0.0
+  beta1: 0.9
+  beta2: 0.999
+
+
+# Metric options
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+
+test_pipeline: null

@@ -1,0 +1,119 @@
+system:
+  random_seed: null
+  mindspore_seed: null
+  numpy_seed: null
+  context_mode: "graph_mode"
+  graph_kernel_flags: null
+
+model:
+  name: "basicvsr_plus_plus_light"
+  # Pretrained weights
+  load_path: "/data/LLVT/BasicVSR_plus_plus/ckpt/basicvsr_plus_plus_ascend_reds4_psnr32.06_20230321.ckpt"
+  params:
+    mid_channels: 64
+    num_blocks: 7
+    num_blocks_align: 5
+    is_low_res_input: True
+    upsample_blocks_last: True
+    has_bias: True
+
+# Dataset options
+dataset:
+  dataset_name: "vimeo_super_resolution"
+  input_path: "/data/LLVT/Basic_VSR/data/vimeo_super_resolution"
+  train_annotation: 'sep_trainlist.txt'
+  test_annotation: 'sep_testlist.txt'
+  gt_subdir: 'sequences'
+  lr_subdir: 'BIx4'
+  return_paths: False
+  transform_while_batching: True
+  batch_size: 8
+  lr_type: "bicubic"
+  scale: 4
+  max_rowsize: 32
+  dataset_sink_mode: False
+  num_frames: 7
+  num_samples: null
+  eval_batch_size: 1
+  num_parallel_workers: 4
+
+# Common training options
+loss:
+  name: "CharbonnierLoss"
+  weight: 1.0
+  amp_level: "O0"
+  loss_scale: 1000.0 # for ['O2', 'O3', 'auto']
+
+# Optimizer options
+optimizer:
+  name: "Adam"
+  learning_rate: 1.0e-4
+  weight_decay: 0.0
+  beta1: 0.9
+  beta2: 0.99
+
+# Scheduler options
+scheduler:
+  name: "cosine_annealing"
+  base_lr: 1.0e-4
+  min_lr: 1.0e-7
+  warmup_epochs: 0
+  warmup_factor: 0.0
+  warmup_base_lr: 1.0e-4 # freeze
+
+# Metric options
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: 'y'
+    process_middle_image: [True, True]
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: 'y'
+    process_middle_image: [True, True]
+
+train_params:
+  initial_epoch: 0
+  epoch_size: 37
+  need_val: True
+  keep_checkpoint_max: 60
+  save_epoch_frq: 1  # 8077 iters equal to 1 epoch with batch size = 8 on Vimeo90K
+  eval_frequency: 1
+  print_frequency: 100
+  ckpt_save_dir: "./ckpt/basicvsr_plus_plus_light"
+
+
+# Preprocessing pipeline and augmentations for training phase
+train_pipeline:
+  - RescaleToZeroOne:
+      keys: [ 'lq', 'gt' ]
+  - PairedRandomCrop:
+      gt_patch_size: 256
+  - RandomFlip:
+      keys: [ 'lq', 'gt' ]
+      flip_ratio: 0.5
+      direction: 'horizontal'
+  - RandomFlip:
+      keys: [ 'lq', 'gt' ]
+      flip_ratio: 0.5
+      direction: 'vertical'
+  - RandomTransposeHW:
+      keys: [ 'lq', 'gt' ]
+      transpose_ratio: 0.5
+  - MirrorSequence:
+      keys: [ 'lq', 'gt' ]
+  - Collect:
+      keys: [ 'lq', 'gt' ]
+
+# Preprocessing pipeline and augmentations for evaluation phase
+test_pipeline:
+  - RescaleToZeroOne:
+      keys: [ 'lq', 'gt' ]
+  - MirrorSequence:
+      keys: [ 'lq', 'gt']
+  - Collect:
+      keys: [ 'lq', 'gt' ]

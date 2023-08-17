@@ -1,0 +1,108 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+# ==============================================================================
+# options
+
+# Context options
+system:
+  device_target: "GPU"
+  random_seed: 1
+  mindspore_seed: 1
+  numpy_seed: 1
+  context_mode: "graph_mode"
+  is_train_distributed: false
+  graph_kernel_flags: null
+
+# Dataset
+dataset:
+  dataset_name: "t91image"
+  input_path: "/data/LLVT/FSRCNN/data/91-image_x4.h5"
+  batch_size: 16
+  num_parallel_workers: 8
+  num_samples: null
+  num_frames: null
+  scale: null
+  dataset_sink_mode: true # different with validate
+  eval_batch_size: 1
+
+val_dataset:
+  dataset_name: "Set5"
+  input_path: "/data/LLVT/FSRCNN/data/Set5_x4.h5"
+  num_parallel_workers: 8
+  num_samples: null
+  num_frames: null
+  scale: null
+  dataset_sink_mode: false # different with validate
+  eval_batch_size: 1
+
+
+# Model
+model:
+  name: "fsrcnn"
+  scale: 4
+  rgb: false
+  load_path: "/data/LLVT/FSRCNN/ckpt/fsrcnn_ms_gpu.ckpt"
+
+# Loss
+loss:
+  name: "mseloss"
+  amp_level: "O3"
+  loss_scale: 1.0
+
+# Scheduler
+scheduler:
+  name: "constant"
+  warmup_epochs: 0
+  base_lr: 1.0e-3
+  min_lr: 1.0e-3
+  warmup_factor: 1.e-3
+  warmup_base_lr: 1.0e-4
+
+# Optimizer
+optimizer:
+  name: "Adam"
+  learning_rate: 0.001
+  beta1: 0.9
+  beta2: 0.999
+  weight_decay: 0.0
+
+# Training
+train:
+  cast_net: "base" # different with ascend
+  cast_loss: "base" # different with ascend
+  is_use_dynamic_loss_scale: false
+  val_monitor: false
+  eval_network: null
+
+# Callback
+train_params:
+  epoch_size: 100
+  need_val: True
+  ckpt_save_dir: "./ckpt/fsrcnn"
+  keep_checkpoint_max: 10
+  save_epoch_frq: 1
+  eval_frequency: 1
+  print_frequency: 1
+  val_acc_monitor_interval: 1
+  # eval when callback
+  img_save_directory: ""
+
+# Metric
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+
+# Preprocessing pipeline and augmentations for training phase
+train_pipeline:
+  null
+
+# Preprocessing pipeline and augmentations for evaluation phase
+test_pipeline:
+  null

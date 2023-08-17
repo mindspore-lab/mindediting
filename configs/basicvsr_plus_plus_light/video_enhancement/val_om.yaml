@@ -1,0 +1,95 @@
+system:
+  random_seed: null
+  mindspore_seed: null
+  numpy_seed: null
+  context_mode: "graph_mode"
+  graph_kernel_flags: null
+
+model:
+  name: "om"
+  load_path: "/data/LLVT/ACL/om/enh_1_26_3_536_960.om"
+
+# Dataset options
+dataset:
+  dataset_name: "ldv_v2"
+  input_path: "/data/LLVT/BasicVSR_plus_plus/data/LDV_V2"
+  resolution: null
+  video_mode: True
+  return_paths: True
+  num_frames: 250
+  scale: 1
+  gt_subdir: 'test_gt'
+  lr_subdir: 'test_lq'
+  batch_size: 1
+  num_samples: null
+  eval_batch_size: 1
+  num_parallel_workers: 1
+  python_multiprocessing: True
+  dataset_sink_mode: False
+  transform_while_batching: False
+
+validator:
+  name: 'tiling'
+  temporal_overlap: 0
+  spatial_overlap: 0
+  temporal_size: 26
+  spatial_size: 0
+  scale: 1
+  input_tensor_type: numpy
+  dtype: float16
+
+# Common training options
+loss:
+  name: "CharbonnierLoss"
+  weight: 1.0
+  amp_level: "O2"
+  loss_scale: 1000.0 # for ['O2', 'O3', 'auto']
+
+# Optimizer options
+optimizer:
+  name: "Adam"
+  learning_rate: 1.0e-4
+  weight_decay: 0.0
+  beta1: 0.9
+  beta2: 0.99
+
+# Scheduler options
+scheduler:
+  name: "warmup_cosine_annealing"
+  base_lr: 1.0e-4
+  min_lr: 1.0e-7
+  warmup_epochs: 0
+  warmup_factor: 1.e-3
+  warmup_base_lr: 1.0e-4
+
+# Metric options
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: 'y'
+    process_middle_image: [False, False]
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: 'y'
+    process_middle_image: [False, False]
+
+# Preprocessing pipeline and augmentations for evaluation phase
+test_pipeline:
+  name: basicvsr_plus_plus_light
+  pipeline:
+    - LoadImageFromFileList:
+        key: 'lq'
+        channel_order: 'rgb'
+    - LoadImageFromFileList:
+        key: 'gt'
+        channel_order: 'rgb'
+    - RescaleToZeroOne:
+        keys: ['lq', 'gt']
+    - Collect:
+        keys: [ 'lq', 'gt' ]
+
+export_helper: default

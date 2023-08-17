@@ -1,0 +1,75 @@
+system:
+  random_seed: null
+  mindspore_seed: null
+  numpy_seed: null
+  context_mode: "graph_mode"
+  graph_kernel_flags: null
+
+model:
+  name: "basicvsr_plus_plus_light"
+  load_path: "/data/LLVT/BasicVSR_plus_plus/ckpt/basicvsr_plus_plus_light_ascend_reds_psnr32.48_20230515.ckpt"
+  params:
+    mid_channels: 64
+    num_blocks: 30
+    num_blocks_align: 5
+    is_low_res_input: False
+    upsample_blocks_last: False
+    has_bias: False
+
+# Dataset options
+dataset:
+  dataset_name: "reds_deblur"
+  input_path: "/data/LLVT/BasicVSR_plus_plus/data/REDS/"
+  video_mode: True
+  scale: 1
+
+  num_samples: null
+  eval_batch_size: 1
+  every_nth: 1
+
+  num_parallel_workers: 4
+  max_rowsize: 200
+  python_multiprocessing: False
+  dataset_sink_mode: False
+  transform_while_batching: True
+
+# Common training options
+loss:
+  name: "CharbonnierLoss"
+  weight: 1.0
+  amp_level: "O0"
+  loss_scale: 1000.0 # for ['O2', 'O3', 'auto']
+
+# Metric options
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+    process_middle_image: [False, False]
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+    process_middle_image: [False, False]
+
+val_params:
+  img_save_directory: "/tmp/basicvsr_plus_plus_light_vdb"
+  save_bgr: True
+
+# Preprocessing pipeline and augmentations for evaluation phase
+test_pipeline:
+  name: basicvsr_plus_plus_light
+  pipeline:
+    - LoadImageFromFileList:
+        key: 'gt'
+        channel_order: 'rgb'
+    - LoadImageFromFileList:
+        key: 'lq'
+        channel_order: 'rgb'
+    - RescaleToZeroOne:
+        keys: [ 'lq', 'gt' ]
+    - Collect:
+        keys: [ 'lq', 'gt' ]

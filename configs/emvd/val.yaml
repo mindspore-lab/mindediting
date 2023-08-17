@@ -1,0 +1,65 @@
+system:
+  random_seed: 1
+  mindspore_seed: 1
+  numpy_seed: 1
+  context_mode: "pynative_mode"
+  graph_kernel_flags: null
+
+
+dataset:
+  dataset_name: "crvd"
+  input_path: "/data/LLVT/EMVD/data/CRVD_dataset/"
+  eval_batch_size: 1
+  num_frames: 25
+  scale: 1
+
+  dataset_sink_mode: False
+  image_height: 128
+  image_width: 128
+  num_parallel_workers: 8
+
+
+model:
+  name: "emvd"
+  load_path: "/data/LLVT/EMVD/ckpt/ms_gpu.ckpt"
+
+
+loss:
+  name: "L1Loss"
+  loss_scale: 1.0
+  amp_level: "O0"
+
+
+scheduler:
+  base_lr: 0.0001
+  min_lr: 1e-08
+  name: "constant"
+
+  weight_decay: 0
+  warmup_epochs: 0
+  warmup_factor: 1.0
+
+# Optimizer options
+optimizer:
+  name: "Adam"
+  weight_decay: 0.0
+  beta1: 0.9
+  beta2: 0.999
+
+
+# Metric options
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+
+
+
+test_pipeline: null

@@ -1,0 +1,21 @@
+task_name: video_enhancement
+task_type: image
+input_file: "/data/LLVT/BasicVSR_plus_plus/data/Set8/motorbike"
+output_file: "/cache/noahtcv_task_denoise"
+windows_size: 1
+fixed_width: 0
+fixed_height: 0
+up_scale: 1
+color_space: rgb
+tasks:
+  - task_name: image denoise
+    task_type: denoise
+    data_io: basic
+    backend: ascend
+    dtype: float16
+    model_file: "/data/LLVT/ACL/om/noahtcv_denoise_fp32_1x3x512x512.om"
+    once_process_frames: 1
+    frame_overlap: 0
+    patch_overlap: 0
+    up_scale: 1
+    tiling: "default"

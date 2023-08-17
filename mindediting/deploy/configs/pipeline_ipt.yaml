@@ -1,0 +1,19 @@
+task_name: image_enhances
+task_type: image
+input_file: ./input/
+output_file: ./result/
+output_format: NCHW
+windows_size: 1
+fixed_width: 0
+fixed_height: 0
+color_space: rgb
+tasks:
+  - task_name: super_resolution_x2
+    task_type: super_resolution
+    data_io: IPT_SR
+    backend: ascend
+    model_file: /data/LLVT/ACL/om/ipt_sr_x2.om
+    once_process_frames: 1
+    up_scale: 2
+    device_id: 0
+    tiling: null

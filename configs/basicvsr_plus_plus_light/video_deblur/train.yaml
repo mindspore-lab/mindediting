@@ -1,0 +1,131 @@
+system:
+  random_seed: null
+  mindspore_seed: null
+  numpy_seed: null
+  context_mode: "graph_mode"
+  graph_kernel_flags: null
+
+model:
+  name: "basicvsr_plus_plus_light"
+  load_path: null
+  params:
+    mid_channels: 64
+    num_blocks: 30
+    num_blocks_align: 5
+    is_low_res_input: False
+    upsample_blocks_last: False
+    has_bias: False
+
+# Dataset options
+dataset:
+  dataset_name: "reds_deblur"
+  input_path: "/data/LLVT/BasicVSR_plus_plus/data/REDS/"
+  video_mode: True
+
+  num_samples: null
+  eval_batch_size: 1
+  batch_size: 1
+  every_nth: 1
+  scale: 1
+
+  num_parallel_workers: 8
+  max_rowsize: 256
+  python_multiprocessing: False
+  dataset_sink_mode: False
+  transform_while_batching: True
+
+# Common training options
+loss:
+  name: "CharbonnierLoss"
+  weight: 1.0
+  amp_level: "O0"
+  loss_scale: 1000.0 # for ['O2', 'O3', 'auto']
+
+# Optimizer options
+optimizer:
+  name: "Adam"
+  learning_rate: 1.0e-4
+  weight_decay: 0.0
+  beta1: 0.9
+  beta2: 0.99
+
+# Scheduler options
+scheduler:
+  name: "cosine_annealing"
+  base_lr: 1.0e-4
+  min_lr: 1.0e-7
+  warmup_epochs: 0
+  warmup_factor: 0.0
+  warmup_base_lr: 1.0e-4 # freeze
+
+# Metric options
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+    process_middle_image: [False, False]
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+    process_middle_image: [False, False]
+
+train_params:
+  initial_epoch: 0
+  epoch_size: 7000
+  need_val: True
+  eval_frequency: 10
+  keep_checkpoint_max: 10
+  save_epoch_frq: 20
+  print_frequency: 100
+  ckpt_save_dir: "./ckpt/basicvsr_plus_plus_light"
+
+val_params:
+  img_save_directory: null
+
+# Preprocessing pipeline and augmentations for training phase
+train_pipeline:
+  - GenerateSegmentIndices:
+      keys: ['lq', 'gt']
+      num_frames: 25
+      random: True
+      interval_list: [1]
+  - LoadImageFromFileList:
+      key: 'gt'
+      channel_order: 'rgb'
+  - LoadImageFromFileList:
+      key: 'lq'
+      channel_order: 'rgb'
+  - PairedRandomCrop:
+      gt_patch_size: 256
+  - RescaleToZeroOne:
+      keys: [ 'lq', 'gt' ]
+  - RandomFlip:
+      keys: [ 'lq', 'gt' ]
+      flip_ratio: 0.5
+      direction: 'horizontal'
+  - RandomFlip:
+      keys: [ 'lq', 'gt' ]
+      flip_ratio: 0.5
+      direction: 'vertical'
+  - RandomTransposeHW:
+      keys: [ 'lq', 'gt' ]
+      transpose_ratio: 0.5
+  - Collect:
+      keys: [ 'lq', 'gt']
+
+# Preprocessing pipeline and augmentations for evaluation phase
+test_pipeline:
+  - LoadImageFromFileList:
+      key: 'gt'
+      channel_order: 'rgb'
+  - LoadImageFromFileList:
+      key: 'lq'
+      channel_order: 'rgb'
+  - RescaleToZeroOne:
+      keys: [ 'lq', 'gt' ]
+  - Collect:
+      keys: [ 'lq', 'gt' ]

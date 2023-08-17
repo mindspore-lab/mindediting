@@ -1,0 +1,122 @@
+# ==============================================================================
+system:
+  device_target: null
+  random_seed: null
+  mindspore_seed: null
+  numpy_seed: null
+  context_mode: "graph_mode"
+  is_train_distributed: false
+  graph_kernel_flags: null # diff with gpu
+  enable_graph_kernel: false
+
+model:
+  name: "vrt"
+  load_path: "/data/LLVT/VRT/ckpt/trained/001_VRT_videosr_bi_REDS_6frames/model_300000_0.ckpt"
+  spynet_load_path: null
+  img_size: # Size of input image. Default: [40, 128, 128].
+    - 40
+    - 128
+    - 128
+  window_size: # Window size. Default: (6,8,8).
+    - 6
+    - 8
+    - 8
+  depths: # Depths of each Transformer stage.
+    - 8
+    - 8
+    - 8
+    - 8
+    - 8
+    - 8
+    - 8
+    - 4
+    - 4
+    - 4
+    - 4
+    - 4
+    - 4
+  indep_reconsts: # Layers that extract features of different frames independently.
+    - 11
+    - 12
+  embed_dims: # Number of linear projection output channels.
+    - 120
+    - 120
+    - 120
+    - 120
+    - 120
+    - 120
+    - 120
+    - 180
+    - 180
+    - 180
+    - 180
+    - 180
+    - 180
+  num_heads: # Number of attention head of each stage.
+    - 6
+    - 6
+    - 6
+    - 6
+    - 6
+    - 6
+    - 6
+    - 6
+    - 6
+    - 6
+    - 6
+    - 6
+    - 6
+  pa_frames: 2 # Number of warpped frames. Default: 2.
+  deformable_groups: 12 # Number of deformable groups. Default: 16.
+  nonblind_denoising: false # If True, conduct experiments on non-blind denoising. Default: False.
+
+# Dataset options
+dataset:
+  dataset_name: "reds"
+  input_path: "/data/LLVT/TTVSR/data/REDS/"
+  train_annotation: 'REDS266.txt'
+  test_annotation: 'REDS4.txt'
+  gt_subdir: 'trainval_sharp_HR/'
+  lq_subdir: 'trainval_sharp_bicubic/X4'
+  batch_size: 1
+  gt_size: 256 # Cropped patched size for gt patches
+  lr_type: "bicubic"
+  scale: 4
+  n_channels: 3
+  dataset_sink_mode: False
+  num_frames: -1 # entire video is loaded
+  num_samples: null
+  eval_batch_size: 1
+  num_parallel_workers: 1
+
+validator:
+  name: "tiling"
+  temporal_overlap: 2
+  spatial_overlap: 20
+  temporal_size: 40 # default is 40, but memory should be considered
+  spatial_size: [128, 128]
+  scale: 4
+
+# Common training options
+loss:
+  name: "CharbonnierLoss"
+  weight: 1.0
+  amp_level: 'O0'
+  loss_scale: 1000.0
+  init_loss_scale: 4096.0
+
+# Metric options
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+
+# Preprocessing pipeline and augmentations for evaluation phase
+test_pipeline: null

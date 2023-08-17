@@ -1,0 +1,180 @@
+system:
+  random_seed: null
+  mindspore_seed: null
+  numpy_seed: null
+  context_mode: "pynative_mode"
+  graph_kernel_flags: null
+
+model:
+  name: "ipt"
+  # Pretrained weights
+  load_path: "/data/LLVT/IPT/ckpt/ipt_x4_ascend_v190_set5_research_cv_acc32.7.ckpt"
+  is_training_finetune: false
+  act: relu
+  test_only: false
+  n_colors: 3
+
+  n_feats: 64
+  transformer:
+    patch_dim: 3
+    num_heads: 12
+    num_layers: 12
+    num_queries: 1
+    dropout_rate: 0
+    no_norm: false
+    post_norm: false
+    no_mlp: false
+    test: true
+    chop_new: true
+    pos_every: false
+    no_pos: false
+    reweight: false
+  RDN:
+    G0: 64
+    RDNkSize: 3
+    RDNconfig: B
+  RCAN:
+    n_resgroups: 10
+    reduction: 16
+
+# mutil-task
+task:
+  alltask:
+    alltask: true
+    task_id: 2 # 2 for SR task, has 0,1,2 three options
+  denoise:
+    denoise: false
+    sigma: 25
+  derain:
+    derain: true
+    finetune: 25
+    derain_test:
+  dehaze:
+    dehaze: false
+    dehaze_test: 100
+    indoor: false
+    outdoor: false
+    nochange: false
+  deblur:
+    deblur: false
+    deblur_test: 1000
+
+# Dataset options
+dataset:
+  dataset_name: "imagenet"
+  input_path: "/data/LLVT/IPT/data_other/imagenet_ipt_mini"
+  dataset_sink_mode: False
+  train_annotation: null
+  test_annotation: null
+  gt_subdir: null
+  lr_subdir: null
+  batch_size: 32
+  scale:
+    - 2
+    - 3
+    - 4
+    - 1
+    - 1
+    - 1
+  split_batch: 1
+  patch_size: 48
+  n_colors: 3
+
+  alltask: true
+  denoise: false
+  derain: true
+  dehaze: false
+  deblur: false
+
+  model: vtip
+  rgb_range: 255
+  jpeg: false
+  num_frames: null
+  num_samples: null
+  eval_batch_size: 1
+  num_parallel_workers: 8
+
+
+# Dataset options
+val_dataset:
+  dataset_name: "set5"
+  input_path: "/data/LLVT/IPT/data_other/Set5"
+  dataset_sink_mode: False
+  train_annotation: null
+  test_annotation: null
+  gt_subdir: 'HR/'
+  lr_subdir: 'LR_bicubic/'
+  batch_size: 1
+  scale:
+    - 4
+  split_batch: 1
+  patch_size: 48
+  rgb_range: 255
+  n_colors: 3
+  num_frames: null
+  num_samples: null
+  eval_batch_size: 1
+  num_parallel_workers: 8
+
+
+# Common training options
+loss:
+  name: 'ipt_pretrain_loss' # only for imagenet pretrain / if finetune, please set l1loss
+  amp_level: "O2"
+  loss_scale: 1024.0
+  init_loss_scale: 65536.0
+  con_loss: true  # only for imagenet pretrain / if finetune, please set False
+  skip_threshold: 1.0e8
+
+
+# Optimizer options
+optimizer:
+  name: "Adam"
+  learning_rate: 1.0e-4
+  weight_decay: 0.0
+  beta1: 0.9
+  beta2: 0.99
+  momentum: 0.9
+
+# Scheduler options
+scheduler:
+  name: "constant"
+  base_lr: 2.5e-5
+  min_lr: 1.0e-7
+  warmup_epochs: 200
+  warmup_factor: 1.0
+  warmup_base_lr: 5.0e-5
+  gamma: 0.5
+
+# Metric options
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: 'y'
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: 'y'
+
+train_params:
+  epoch_size: 500
+  need_val: True
+  keep_checkpoint_max: 60
+  save_epoch_frq: 1
+  eval_frequency: 1
+  print_frequency: 1
+  ckpt_save_dir: "./ckpt/ipt"
+
+
+# Preprocessing pipeline and augmentations for training phase
+train_pipeline:
+  null
+
+# Preprocessing pipeline and augmentations for evaluation phase
+test_pipeline:
+  null
+
+export_helper: ipt

@@ -1,0 +1,21 @@
+task_name: image_deblur
+task_type: image
+input_file: <folder>
+output_file: <folder>
+windows_size: 1
+fixed_width: 480
+fixed_height: 360
+up_scale: 1
+color_space: rgb
+tasks:
+  - task_name: image_deblur_mimo_unet
+    task_type: super_resolution
+    data_io: BasicVSR_MindSpore
+    backend: ascend
+    dtype: float16
+    model_file: "mimo_unet.om"
+    once_process_frames: 1
+    frame_overlap: 0
+    patch_overlap: 0
+    up_scale: 1
+    device_id: 0

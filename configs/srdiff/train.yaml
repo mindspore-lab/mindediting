@@ -1,0 +1,150 @@
+system:
+  random_seed: null
+  mindspore_seed: null
+  numpy_seed: null
+  context_mode: "graph_mode"
+  graph_kernel_flags: null
+
+export_helper: "srdiff"
+
+model:
+  name: "srdiff"
+  encoder: "rrdb"
+  encoder_in_ch: 3
+  encoder_out_ch: 3
+  encoder_mid_ch: 64
+  encoder_num_blocks: 8
+  encoder_int_ch: 32
+  hidden_size: 64
+  dim_mults: [1, 2, 4, 8]
+  scale: 4
+  bias: true
+  timesteps: 100
+  beta_schedule: "cosine"
+  beta_s: 0.008
+  beta_end: 0.02
+  res: True
+  res_rescale: 2.0
+  up_input: False
+  encoder_load_path: "/data/LLVT/RRDB/ckpt/rrdb_ascend_div2k_psnr30.68_20230524.ckpt"
+  load_path: ""
+
+# Dataset options
+dataset:
+  dataset_name: "df2k"
+  input_path: ["/data/LLVT/RRDB/data/div2k", "/data/LLVT/RRDB/data/flickr2k"]
+  batch_size: 64
+  lr_type: "bicubic"
+  scale: 4
+  divisor: 8
+  num_frames: 1
+  max_rowsize: 64
+  dataset_sink_mode: False
+  eval_batch_size: 1
+  num_parallel_workers: 1
+
+val_dataset:
+  dataset_name: "div2k"
+  input_path: "/data/LLVT/RRDB/data/div2k"
+  batch_size: 1
+  lr_type: "bicubic"
+  scale: 4
+  divisor: 8
+  num_frames: 1
+  max_rowsize: 64
+  dataset_sink_mode: False
+  eval_batch_size: 1
+  num_parallel_workers: 1
+
+# Common training options
+loss:
+  name: "l1loss"
+  weight: 1.0
+  amp_level: "O0"
+  loss_scale: 1000.0 # for ['O2', 'O3', 'auto']
+
+# Optimizer options
+optimizer:
+  name: "Adam"
+  learning_rate: 1.6e-4
+  weight_decay: 0.0
+  beta1: 0.9
+  beta2: 0.99
+
+# Scheduler options
+scheduler:
+  name: "cosine_annealing"
+  base_lr: 1.6e-4
+  min_lr: 1.0e-5
+  warmup_epochs: 0
+  warmup_factor: 0.0
+  warmup_base_lr: 1.6e-4
+  ignore_params: "encoder"
+
+# Metric options
+metric:
+  PSNR:
+    reduction: "avg"
+    crop_border: 0
+    input_order: "CHW"
+    convert_to: "y"
+    process_middle_image: [False, False]
+  SSIM:
+    reduction: "avg"
+    crop_border: 0
+    input_order: "CHW"
+    convert_to: "y"
+    process_middle_image: [False, False]
+
+train_params:
+  epoch_size: 60
+  need_val: True
+  keep_checkpoint_max: 60
+  save_epoch_frq: 6 # 10942
+  eval_frequency: 6
+  print_frequency: 100
+  ckpt_save_dir: "./ckpt_srdiff_df2k"
+
+
+# Preprocessing pipeline and augmentations for training phase
+train_pipeline:
+  name: srdiff
+  pipeline:
+    - PairedRandomCrop:
+        gt_patch_size: 160
+    - RandomFlip:
+        keys: [ 'lq', 'gt' ]
+        flip_ratio: 0.5
+        direction: 'horizontal'
+    - RandomFlip:
+        keys: [ 'lq', 'gt' ]
+        flip_ratio: 0.5
+        direction: 'vertical'
+    - RandomTransposeHW:
+        keys: [ 'lq', 'gt' ]
+        transpose_ratio: 0.5
+    - Resize:
+        in_key: 'lq'
+        out_key: 'lq_up'
+        scale: 4
+    - RescaleToZeroOne:
+        keys: [ 'lq', 'gt', 'lq_up' ]
+    - Normalize:
+        keys: [ 'lq', 'gt', 'lq_up' ]
+    - Collect:
+        keys: [ 'lq', 'gt', 'lq_up' ]
+
+# Preprocessing pipeline and augmentations for evaluation phase
+test_pipeline:
+  name: srdiff
+  pipeline:
+    - Resize:
+        in_key: 'lq'
+        out_key: 'lq_up'
+        scale: 4
+    - RescaleToZeroOne:
+        keys: [ 'lq', 'gt', 'lq_up' ]
+    - Normalize:
+        keys: [ 'lq', 'lq_up' ]
+    - Collect:
+        keys: [ 'lq', 'gt', 'lq_up' ]

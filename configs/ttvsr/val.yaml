@@ -1,0 +1,72 @@
+# ==============================================================================
+system:
+  random_seed: null
+  mindspore_seed: null
+  numpy_seed: null
+  context_mode: "graph_mode"
+  graph_kernel_flags: null
+
+model:
+  name: "ttvsr"
+  # Pretrained weights
+  load_path: "/data/LLVT/TTVSR/ckpt/TTVSR_REDS.ckpt"
+  spynet_load_path: "/data/LLVT/TTVSR/ckpt/spynet_20210409-c6c1bd09.ckpt"
+  mid_channels: 64
+  num_blocks: 60
+  stride: 4
+
+# Dataset options
+dataset:
+  dataset_name: "reds"
+  input_path: "/data/LLVT/TTVSR/data/REDS/"
+  train_annotation: 'REDS266.txt'
+  test_annotation: 'REDS4.txt'
+  gt_subdir: 'trainval_sharp_HR/'
+  lq_subdir: 'trainval_sharp_bicubic/X4'
+  batch_size: 2  # for all devices
+  lr_type: "bicubic"
+  scale: 4
+  dataset_sink_mode: False
+  num_frames: 10
+  num_samples: null
+  eval_batch_size: 1
+  num_parallel_workers: 8
+
+
+# Common training options
+loss:
+  name: "CharbonnierLoss"
+  loss_weight: 1.0
+  amp_level: 'O0'
+
+# Metric options (use RGB channel)
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+
+# Preprocessing pipeline and augmentations for evaluation phase
+test_pipeline:
+  - GenerateSegmentIndices:
+      interval_list: 1
+  - LoadImageFromFileList:
+      keys: 'lq'
+      channel_order: 'rgb'
+      io_backend: 'disk'
+  - LoadImageFromFileList:
+      keys: 'lq'
+      channel_order: 'rgb'
+      io_backend: 'disk'
+  - RescaleToZeroOne:
+      keys: [ 'lq', 'gt' ]
+  - FramesToTensor:
+      keys: [ 'lq', 'gt' ]
+  - Collect:
+      keys: [ 'lq', 'gt' ]

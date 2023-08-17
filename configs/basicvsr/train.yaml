@@ -1,0 +1,135 @@
+system:
+  random_seed: null
+  mindspore_seed: null
+  numpy_seed: null
+  context_mode: "graph_mode"
+  graph_kernel_flags: null
+
+model:
+  name: "basicvsr"
+  # Pretrained weights
+  load_path: ""
+  spynet_load_path: "/data/LLVT/Basic_VSR/ckpt/spynet_20210409-c6c1bd09.ckpt"
+
+# Dataset options
+dataset:
+  dataset_name: "vimeo_super_resolution"
+  input_path: "/data/LLVT/Basic_VSR/data/vimeo_super_resolution"
+  train_annotation: 'sep_trainlist.txt'
+  test_annotation: 'sep_testlist.txt'
+  gt_subdir: 'sequences'
+  lr_subdir: 'BIx4'
+  batch_size: 8  # for all GPUs
+  lr_type: "bicubic"
+  scale: 4
+  max_rowsize: 32
+  dataset_sink_mode: False
+  num_frames: 7
+  num_samples: null
+  eval_batch_size: 1
+  num_parallel_workers: 8
+
+# Common training options
+loss:
+  name: "CharbonnierLoss"
+  weight: 1.0
+  amp_level: "O0"
+  loss_scale: 1000.0 # for ['O2', 'O3', 'auto']
+
+# Optimizer options
+optimizer:
+  name: "Adam"
+  learning_rate: 1.0e-3
+  weight_decay: 0.0
+  beta1: 0.9
+  beta2: 0.99
+
+# Scheduler options
+scheduler:
+  name: "cosine_annealing"
+  base_lr: 2.0e-4
+  min_lr: 1.0e-7
+  warmup_epochs: 0
+  warmup_factor: 0.0
+  warmup_base_lr: 2.0e-4 # freeze
+
+extra_scheduler:
+  name: "warmup_cosine_annealing"
+  lr_mul: 0.125
+  warmup_epochs: 9 # freeze epochs ~5000 iter for vimeo
+  warmup_factor: 0.0
+  warmup_base_lr: 0.0 # freeze
+  param_prefixes: ["spynet"]
+
+# Metric options
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: 'y'
+    process_middle_image: [True, True]
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: 'y'
+    process_middle_image: [True, True]
+
+train_params:
+  epoch_size: 37
+  need_val: True
+  keep_checkpoint_max: 60
+  save_epoch_frq: 1
+  eval_frequency: 1
+  print_frequency: 100
+  ckpt_save_dir: "./ckpt/basicvsr"
+
+
+# Preprocessing pipeline and augmentations for training phase
+train_pipeline:
+  name: basicvsr
+  pipeline:
+    - RescaleToZeroOne:
+        keys: [ 'lq', 'gt' ]
+    - PairedRandomCrop:
+        gt_patch_size: 256
+    - RandomFlip:
+        keys: [ 'lq', 'gt' ]
+        flip_ratio: 0.5
+        direction: 'horizontal'
+    - RandomFlip:
+        keys: [ 'lq', 'gt' ]
+        flip_ratio: 0.5
+        direction: 'vertical'
+    - RandomTransposeHW:
+        keys: [ 'lq', 'gt' ]
+        transpose_ratio: 0.5
+    - MirrorSequence:
+        keys: [ 'lq', 'gt' ]
+    - Collect:
+        keys: [ 'lq', 'gt' ]
+
+# Preprocessing pipeline and augmentations for evaluation phase
+test_pipeline:
+  name: basicvsr
+  pipeline:
+    - RescaleToZeroOne:
+        keys: [ 'lq', 'gt' ]
+    - MirrorSequence:
+        keys: [ 'lq', 'gt' ]
+    - Collect:
+        keys: [ 'lq', 'gt' ]
+
+# Optimizations
+optimization:
+  precompute_grid: False
+  spynet:
+    base_resolution: [ [ 64, 64 ], [ 64, 128 ] ]
+    levels: 6
+  basicvsr:
+    base_resolution: [ [ 64, 64 ], [ 64, 112 ] ]
+    levels: 1
+  eliminate_gradient_for_gather: False
+
+export_helper: basicvsr

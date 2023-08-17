@@ -1,0 +1,87 @@
+# ==============================================================================
+system:
+  random_seed: null
+  mindspore_seed: null
+  numpy_seed: null
+  context_mode: "graph_mode"
+  graph_kernel_flags: null
+  enable_graph_kernel: False
+
+model:
+  name: "ifr_plus"
+  load_path: "/data/LLVT/IFR_Plus/ckpt/converted/ifr_plus_v155_tuned.ckpt"
+  encoder_load_path: null
+  input_channels: 3
+  decoder_channels: [ 64, 96, 144, 192 ]
+  side_channels: 64
+  refiner_channels: [ 24, 48, 96 ]
+  to_float16: False
+  flow_scale_factor: 0.125
+  refiner_scale_factor: 0.5
+
+validator:
+  name: "tiling"
+  temporal_overlap: 0
+  spatial_overlap: 0
+  temporal_size: 0
+  spatial_size: [0, 0]  # h,w
+  scale: 1
+  input_tensor_type: "mindspore"
+
+# Dataset options
+dataset:
+  dataset_name: "vimeo_triplet"
+  input_path: "/data/LLVT/IFR_Plus/data/vimeo_triplet_reduced"
+  train_annotation: 'tri_trainlist.txt'
+  test_annotation: 'tri_testlist.txt'
+  flow_type: null
+  batch_size: 12
+  num_frames: null
+  dataset_sink_mode: False
+  num_samples: null
+  eval_batch_size: 1
+  num_parallel_workers: 2
+  every_nth: 1
+
+# Common training options
+loss:
+  name: "CharbonnierLoss"
+  loss_weight: 1.0
+  amp_level: 'O0'
+
+# Optimizer options
+optimizer:
+  name: "AdamW"
+  weight_decay: 1.0e-2
+  beta1: 0.9
+  beta2: 0.999
+  eps: 1.0e-8
+  learning_rate: 1.0e-4
+
+# Scheduler options
+scheduler:
+  name: "cosine_annealing"
+  base_lr: 1.0e-4
+  min_lr: 1.0e-6
+
+# Metric options (use RGB channel)
+metric:
+  PSNR:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+  SSIM:
+    reduction: 'avg'
+    crop_border: 0
+    input_order: 'CHW'
+    convert_to: null
+
+# Preprocessing pipeline and augmentations for evaluation phase
+test_pipeline:
+  name: "ifr_plus"
+  pipeline:
+    - RescaleToZeroOne:
+        keys: [ 'inputs', 'target' ]
+    - Collect:
+        keys: [ 'inputs', 'target' ]
