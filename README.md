@@ -33,8 +33,10 @@ Some Demos:
 
 - **Video frame Interpolation demo**
 
-<video src="./docs/video/Video_frame_Interpolation_Demo_IFRNet.mp4">
-</video>
+
+
+https://github.com/mindspore-lab/mindediting/assets/119313434/28e37ba1-6628-4711-ad93-e726ee3f275b
+
 
 <details open>
 <summary>Main features</summary>
