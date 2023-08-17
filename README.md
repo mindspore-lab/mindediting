@@ -28,7 +28,7 @@ Some Demos:
 
 - **Video super-resolution demo**
 
-<video src="https://github.com/mindspore-lab/mindediting/blob/master/docs/video/Video_SR_Demo.mp4">
+<video src="https://github.com/mindspore-lab/mindediting/assets/119313434/42433617-54a0-4fd1-abe0-fc7cf6b2fe77">
 </video>
 
 - **Video frame Interpolation demo**
