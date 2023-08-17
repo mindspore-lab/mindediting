@@ -32,10 +32,11 @@ Some Demos:
 </video>
 
 - **Video frame Interpolation demo**
+<video src="https://github.com/mindspore-lab/mindediting/assets/119313434/28e37ba1-6628-4711-ad93-e726ee3f275b">
+</video>
 
 
 
-https://github.com/mindspore-lab/mindediting/assets/119313434/28e37ba1-6628-4711-ad93-e726ee3f275b
 
 
 <details open>
