@@ -25,12 +25,12 @@ MindEditing是基于MindSpore的开源工具包，包含开源或华为技术有
 
 - **视频超分演示**
 
-<video src="./docs/video/Video_SR_Demo.mp4">
+<video src="https://github.com/mindspore-lab/mindediting/assets/119313434/28e37ba1-6628-4711-ad93-e726ee3f275b">
 </video>
 
 - **视频插帧演示**
 
-<video src="./docs/video/Video_frame_Interpolation_Demo_IFRNet.mp4">
+<video src="https://github.com/mindspore-lab/mindediting/assets/119313434/42433617-54a0-4fd1-abe0-fc7cf6b2fe77">
 </video>
 
 <details open>
@@ -208,25 +208,31 @@ epoch 1/100 step 3/133, loss = 0.02718924, duration_time = 00:01:13, step_time_a
 
 ## 模型列表
 
-| 模型名                                              | 任务                       | 会议                                                                                                                                                                     | 支持平台   |
-| --------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
-| [IPT](docs/ipt_CN.md)                                  | 多任务                     | [CVPR 2021](https://arxiv.org/abs/2012.00364)                                                                                                                               | Ascend/GPU |
-| [BasicVSR](docs/basicvsr_CN.md)                        | 视频超分辨率               | [CVPR 2021](https://arxiv.org/abs/2012.02181)                                                                                                                               | Ascend/GPU |
-| [BasicVSR++Light](docs/basicvsr_plus_plus_light_CN.md) | 视频超分辨率               | [CVPR 2022](https://arxiv.org/abs/2104.13371)                                                                                                                               | Ascend/GPU |
-| [NOAHTCV](docs/noahtcv_CN.md)                          | 图像去噪                   | [CVPR 2021(MAI Challenge)](https://arxiv.org/pdf/2105.08629.pdf)                                                                                                            | Ascend/GPU |
-| [RRDB](docs/rrdb_CN.md)                                | 图像超分辨率               |                                                                                                                                                                          | Ascend/GPU |
-| [FSRCNN](docs/fsrcnn_CN.md)                            | 图像超分辨率               | [ECCV 2016](https://arxiv.org/pdf/1608.00367.pdf)                                                                                                                           | Ascend/GPU |
-| [SRDiff](docs/srdiff_CN.md)                            | 图像超分辨率               | [Neurocomputing 2022](https://arxiv.org/abs/2104.14951)                                                                                                                     | Ascend/GPU |
-| [VRT](docs/vrt_CN.md)                                  | 多任务                     | [arXiv(2022.01)](https://arxiv.org/abs/2201.12288)                                                                                                                          | Ascend/GPU |
-| [RVRT](docs/rvrt_CN.md)                                | 多任务                     | [arXiv(2022.06)](https://arxiv.org/abs/2206.02146)                                                                                                                          | Ascend/GPU |
-| [TTVSR](docs/ttvsr_CN.md)                              | 视频超分辨率               | [CVPR 2022](https://arxiv.org/abs/2204.04216)                                                                                                                               | Ascend/GPU |
-| [MIMO-Unet](docs/mimo_unet_CN.md)                      | 图像去模糊                 | [ICCV 2021](https://arxiv.org/abs/2108.05054)                                                                                                                               | Ascend/GPU |
-| [NAFNet](docs/nafnet_CN.md)                            | 图像去模糊                 | [arXiv(2022.04)](https://arxiv.org/abs/2204.04676)                                                                                                                          | Ascend/GPU |
-| [CTSDG](docs/ctsdg_CN.md)                              | 图像修复                   | [ICCV 2021](https://arxiv.org/pdf/2108.09760.pdf)                                                                                                                           | Ascend/GPU |
-| [EMVD](docs/emvd_CN.md)                                | 视频去噪                   | [CVPR 2021](https://openaccess.thecvf.com/content/CVPR2021/papers/Maggioni_Efficient_Multi-Stage_Video_Denoising_With_Recurrent_Spatio-Temporal_Fusion_CVPR_2021_paper.pdf) | Ascend/GPU |
-| [Tunable_Conv](docs/tunable_conv_CN.md)                | 可调任务(图像处理)         | [arXiv(2023.04)](https://arxiv.org/abs/2304.00898v1)                                                                                                                        | Ascend/GPU |
-| [IFR+](docs/ifr_plus_CN.md)                            | 视频帧插值                 | [CVPR 2022](https://arxiv.org/abs/2205.14620)                                                                                                                               | Ascend/GPU |
-| [MPFER](docs/mpfer_CN.md)                              | 基于3d的多帧去噪(即将推出) | [arXiv(2023.04)](https://arxiv.org/pdf/2303.18139.pdf)                                                                                                                      | GPU        |
+| 模型名                                                 | 任务                       | 会议                                                         | 支持平台 | 下载 |
+| ------------------------------------------------------ | -------------------------- | ------------------------------------------------------------ | ---------- | ---------- |
+| [IPT](docs/ipt_CN.md)                                  | 多任务                     | [CVPR 2021](https://arxiv.org/abs/2012.00364)                | Ascend/GPU |[ckpt](https://download.mindspore.cn/toolkits/mindediting/LLVT_opensource/IPT/ckpt/)|
+| [BasicVSR](docs/basicvsr_CN.md)                        | 视频超分辨率               | [CVPR 2021](https://arxiv.org/abs/2012.02181)                | Ascend/GPU |[ckpt](https://download.mindspore.cn/toolkits/mindediting/LLVT_opensource/Basic_VSR/ckpt/)|
+| [BasicVSR++Light](docs/basicvsr_plus_plus_light_CN.md) | 视频超分辨率               | [CVPR 2022](https://arxiv.org/abs/2104.13371)                | Ascend/GPU |[ckpt](https://download.mindspore.cn/toolkits/mindediting/LLVT_opensource/BasicVSR_plus_plus/ckpt/)|
+| [NOAHTCV](docs/noahtcv_CN.md)                          | 图像去噪                   | [CVPR 2021(MAI Challenge)](https://arxiv.org/pdf/2105.08629.pdf) | Ascend/GPU |[ckpt](https://download.mindspore.cn/toolkits/mindediting/LLVT_opensource/NoahTCV/ckpt/best_gpu.ckpt)|
+| [RRDB](docs/rrdb_CN.md)                                | 图像超分辨率               |                                                              | Ascend/GPU |[ckpt](https://download.mindspore.cn/toolkits/mindediting/LLVT_opensource/RRDB/ckpt/rrdb_ascend_div2k_psnr30.68_20230524.ckpt)|
+| [FSRCNN](docs/fsrcnn_CN.md)                            | 图像超分辨率               | [ECCV 2016](https://arxiv.org/pdf/1608.00367.pdf)            | Ascend/GPU |[ckpt](https://download.mindspore.cn/toolkits/mindediting/LLVT_opensource/FSRCNN/ckpt/)|
+| [SRDiff](docs/srdiff_CN.md)                            | 图像超分辨率               | [Neurocomputing 2022](https://arxiv.org/abs/2104.14951)      | Ascend/GPU |[ckpt](https://download.mindspore.cn/toolkits/mindediting/LLVT_opensource/SRDiff/ckpt/srdiff_ascend_div2k_psnr28.78_20230524.ckpt)|
+| [VRT](docs/vrt_CN.md)                                  | 多任务                     | [arXiv(2022.01)](https://arxiv.org/abs/2201.12288)           | Ascend/GPU |[ckpt](https://download.mindspore.cn/toolkits/mindediting/LLVT_opensource/VRT/ckpt/)|
+| [RVRT](docs/rvrt_CN.md)                                | 多任务                     | [arXiv(2022.06)](https://arxiv.org/abs/2206.02146)           | Ascend/GPU |[ckpt](https://download.mindspore.cn/toolkits/mindediting/LLVT_opensource/RVRT/ckpt/trained/)|
+| [TTVSR](docs/ttvsr_CN.md)                              | 视频超分辨率               | [CVPR 2022](https://arxiv.org/abs/2204.04216)                | Ascend/GPU |[ckpt](https://download.mindspore.cn/toolkits/mindediting/LLVT_opensource/TTVSR/ckpt/)|
+| [MIMO-Unet](docs/mimo_unet_CN.md)                      | 图像去模糊                 | [ICCV 2021](https://arxiv.org/abs/2108.05054)                | Ascend/GPU |[ckpt](https://download.mindspore.cn/toolkits/mindediting/LLVT_opensource/MIMO-UNet/ckpt/MIMO-UNet_3000_1_fp16_o3_dls.ckpt)|
+| [NAFNet](docs/nafnet_CN.md)                            | 图像去模糊                 | [arXiv(2022.04)](https://arxiv.org/abs/2204.04676)           | Ascend/GPU |[ckpt](https://download.mindspore.cn/toolkits/mindediting/LLVT_opensource/NAFNet/ckpt/nafnet_ascend_gopro_20230613.ckpt)|
+| [CTSDG](docs/ctsdg_CN.md)                              | 图像修复                   | [ICCV 2021](https://arxiv.org/pdf/2108.09760.pdf)            | Ascend/GPU |[ckpt](https://download.mindspore.cn/toolkits/mindediting/LLVT_opensource/CTSDG/ckpt/)|
+| [EMVD](docs/emvd_CN.md)                                | 视频去噪                   | [CVPR 2021](https://openaccess.thecvf.com/content/CVPR2021/papers/Maggioni_Efficient_Multi-Stage_Video_Denoising_With_Recurrent_Spatio-Temporal_Fusion_CVPR_2021_paper.pdf) | Ascend/GPU |[ckpt](https://download.mindspore.cn/toolkits/mindediting/LLVT_opensource/EMVD/ckpt/ms_gpu.ckpt)|
+| [Tunable_Conv](docs/tunable_conv_CN.md)                | 可调任务(图像处理)         | [arXiv(2023.04)](https://arxiv.org/abs/2304.00898v1)         | Ascend/GPU |[ckpt](https://download.mindspore.cn/toolkits/mindediting/LLVT_opensource/Tunable_Conv/ckpt/)|
+| [IFR+](docs/ifr_plus_CN.md)                            | 视频帧插值                 | [CVPR 2022](https://arxiv.org/abs/2205.14620)                | Ascend/GPU |[ckpt](https://download.mindspore.cn/toolkits/mindediting/LLVT_opensource/IFR_Plus/ckpt/converted/)|
+| [MPFER](docs/mpfer_CN.md)                              | 基于3d的多帧去噪(即将推出) | [arXiv(2023.04)](https://arxiv.org/pdf/2303.18139.pdf)       | GPU        |[ckpt](https://download.mindspore.cn/toolkits/mindediting/LLVT_opensource/MPFER/ckpt/mpfer16_ms/)|
+
+**下载事项:** 模型文件有`.ckpt`和`.om`两种格式，您可以下载相应的文件进行研究工作。
+-  点击上表`下载`栏中的相应链接即可下载`.ckpt`文件。
+-  `.om`文件可以在这里找到 [here](https://download.mindspore.cn/toolkits/mindediting/LLVT_opensource/ACL/om/)。关于如何使用`.om`文件的详细信息，请参见 [deploy](mindediting/deploy/README.md)。
+-  多任务模型可以根据任务划分下载相应的模型文件，模型文件的选择参考`configs`文件夹中不同模型的`yaml`文件。
+-  对于需要`spynet`或`vgg`预训练权重的模型，也可以在相应的模型链接中下载。
 
 关于模型的更多信息请看 [ModelZoo Homepage](https://gitee.com/mindspore/models) 或者 `docs`文件夹下的模型文档。
 
