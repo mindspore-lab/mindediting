@@ -27,12 +27,12 @@ platforms, including CPU/GPU/Ascend.Of course, you'll get an even better experie
 Some Demos:
 
 - **Video super-resolution demo**
-
-<video src="https://github.com/mindspore-lab/mindediting/assets/119313434/42433617-54a0-4fd1-abe0-fc7cf6b2fe77">
+<video src="https://github.com/mindspore-lab/mindediting/assets/119313434/28e37ba1-6628-4711-ad93-e726ee3f275b">
 </video>
 
+
 - **Video frame Interpolation demo**
-<video src="https://github.com/mindspore-lab/mindediting/assets/119313434/28e37ba1-6628-4711-ad93-e726ee3f275b">
+<video src="https://github.com/mindspore-lab/mindediting/assets/119313434/42433617-54a0-4fd1-abe0-fc7cf6b2fe77">
 </video>
 
 
