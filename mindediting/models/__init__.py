@@ -55,6 +55,7 @@ from mindediting.utils.checkpoint import load_vrt
 from mindediting.utils.download import DownLoad
 from mindediting.utils.init_weights import init_weights
 from mindediting.utils.utils import cast_module, change_dict_name, check_if_mirrored, is_ascend
+from mindediting.deploy.utils.config import Config, parse_yaml
 
 _module_to_models = defaultdict(set)
 _model_to_module = {}
@@ -471,16 +472,38 @@ def download_ckpt(cfg):
             download.download_url(url=v, path=path)
             setattr(cfg.model, k, path)
 
+MODEL_NAME_TO_DEFAULT_INFO = {
+    'IPT_DENOISE': ['ipt', 'configs/ipt/denoise/val_denoise_50.yaml'],
+    'IPT_DERAIN': ['ipt', 'configs/ipt/derain/val_derain.yaml'],
+    'IPT_SR_X2': ['ipt', 'configs/ipt/super_resolution/val_sr_x2.yaml'],
+    'IPT_SR_X3': ['ipt', 'configs/ipt/super_resolution/val_sr_x3.yaml'],
+    'IPT_SR_X4': ['ipt', 'configs/ipt/super_resolution/val_sr_x4.yaml'],
+    'FSRCNN_SR_X4': ['fsrcnn', 'configs/fsrcnn/val_sr_x4_Set5_gpu.yaml'],
+    'CTSDG': ['ctsdg', 'configs/ctsdg/val_inpainting_celeba_gpu.yaml'],
+    'MIMOUNET': ['mimo_unet', 'configs/mimo_unet/val_deblur_gopro_gpu.yaml'],
+    'NOAHTCV': ['noahtcv', 'configs/noahtcv/val.yaml'],
 
-def create_model_by_name(model_name, cfg):
+}
+
+def create_model_by_name(model_name, cfg=None):
+    cfg, network_creator = get_model_info(model_name, cfg)
     download_ckpt(cfg)
-    model_name = model_name.lower()
-    if model_name not in _model_entrypoints:
+    if network_creator not in _model_entrypoints:
         raise Exception
-    net, eval_network = _model_entrypoints[model_name](cfg)
+    net, eval_network = _model_entrypoints[network_creator](cfg)
     if eval_network:
         eval_network.set_train(mode=False)
     return net, eval_network
+
+def get_model_info(model_name, cfg=None):
+    if not cfg:
+        default_cfg_path = MODEL_NAME_TO_DEFAULT_INFO[model_name][1]
+        default_cfg, _, _ = parse_yaml(default_cfg_path)
+        default_cfg = Config(default_cfg)
+        default_cfg.model.load_path = None
+    model_creator_name = MODEL_NAME_TO_DEFAULT_INFO[model_name][0]
+    return default_cfg, model_creator_name
+
 
 
 if __name__ == "__main__":
