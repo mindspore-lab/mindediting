@@ -496,13 +496,13 @@ def create_model_by_name(model_name, cfg=None):
     return net, eval_network
 
 def get_model_info(model_name, cfg=None):
-    if not cfg:
+    if cfg is None:
         default_cfg_path = MODEL_NAME_TO_DEFAULT_INFO[model_name][1]
-        default_cfg, _, _ = parse_yaml(default_cfg_path)
-        default_cfg = Config(default_cfg)
-        default_cfg.model.load_path = None
+        cfg, _, _ = parse_yaml(default_cfg_path)
+        cfg = Config(default_cfg)
+        cfg.model.load_path = None
     model_creator_name = MODEL_NAME_TO_DEFAULT_INFO[model_name][0]
-    return default_cfg, model_creator_name
+    return cfg, model_creator_name
 
 
 
