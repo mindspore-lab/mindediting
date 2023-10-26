@@ -37,7 +37,7 @@ dataset:
 
 # Model
 model:
-  name: "ctsdg"
+  name: "CTSDG"
   load_path: '/data/LLVT/CTSDG/ckpt/ctsdg_generator_061250.ckpt'
   load_discriminator_path: null
   pretrained_vgg: null

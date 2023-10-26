@@ -6,7 +6,7 @@ system:
   graph_kernel_flags: null
 
 model:
-  name: "ipt"
+  name: "IPT_SR_X2"
   # Pretrained weights
   load_path: "/data/LLVT/IPT/ckpt/ipt_x2_ascend_v190_set5_research_cv_acc38.3.ckpt"
   is_training_finetune: false

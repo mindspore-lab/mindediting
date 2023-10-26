@@ -6,7 +6,7 @@ system:
   graph_kernel_flags: null
 
 model:
-  name: "ipt"
+  name: "IPT_DERAIN"
   # Pretrained weights
   load_path: "/data/LLVT/IPT/ckpt/ipt_derain_ascend_v190_rain100l_research_cv_acc42.0.ckpt"
   is_training_finetune: false

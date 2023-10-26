@@ -10,7 +10,7 @@ system:
 
 model:
   name: "IPT_DENOISE"
-  load_path: "/home/tbaydasov/val_tests/models/LLVT/ckpt/IPT/ipt_denoise50_ascend_v190_cbsd68_research_cv_acc29.9.ckpt"
+  load_path: "/data/LLVT/IPT/ckpt/ipt_denoise50_ascend_v190_cbsd68_research_cv_acc29.9.ckpt"
   is_training_finetune: false
   task_type: 'denoise'
   act: relu
