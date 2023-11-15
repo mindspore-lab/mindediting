@@ -65,7 +65,7 @@ task:
 # Dataset options
 dataset:
   dataset_name: "cbsd68"
-  input_path: "/home/tbaydasov/datasets/llvt_datasets/CBSD68"
+  input_path: "/data/LLVT/IPT/data/CBSD68"
   dataset_sink_mode: False
   train_annotation: null
   test_annotation: null
