@@ -18,7 +18,7 @@ dataset:
 
 
 model:
-  name: "noahtcv"
+  name: "NOAHTCV"
   load_path: "/data/LLVT/NoahTCV/ckpt/best_gpu.ckpt"
 
 

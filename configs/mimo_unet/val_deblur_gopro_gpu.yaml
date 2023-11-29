@@ -29,7 +29,7 @@ dataset:
 
 # Model
 model:
-  name: "mimo_unet"
+  name: "MIMOUNET"
   load_path: "/data/LLVT/MIMO-UNet/ckpt/MIMO-UNet_3000_1_fp16_o3_dls.ckpt"
 
 # Loss

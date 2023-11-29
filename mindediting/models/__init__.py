@@ -499,7 +499,7 @@ def get_model_info(model_name, cfg=None):
     if cfg is None:
         default_cfg_path = MODEL_NAME_TO_DEFAULT_INFO[model_name][1]
         cfg, _, _ = parse_yaml(default_cfg_path)
-        cfg = Config(default_cfg)
+        cfg = Config(cfg)
         cfg.model.load_path = None
     model_creator_name = MODEL_NAME_TO_DEFAULT_INFO[model_name][0]
     return cfg, model_creator_name

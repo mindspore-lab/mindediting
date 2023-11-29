@@ -25,7 +25,7 @@ dataset:
 
 # Model
 model:
-  name: "fsrcnn"
+  name: "FSRCNN_SR_X4"
   scale: 4
   rgb: false
   load_path: "/data/LLVT/FSRCNN/ckpt/fsrcnn_ms_gpu.ckpt"
